@@ -1,24 +1,45 @@
 ---
 name: vibecoding-optimization
-description: 'A skill focused on optimizing programming-related tasks, aimed at improving the model’s reliability in software development. It handles programming tasks through clearly defined rules and guidelines, provides technology stack recommendations, and ensures consistency and high quality throughout implementation. By default, this skill is automatically activated for programming-related tasks and remains continuously effective; users can also control its status with `/vibecoding-optimization <on/off>` or `/vibecoding <on/off>`.'
+description: 'A coding optimization skill for engineering tasks. It is not always on by default: activate via `/vibecoding-optimization on` or `/vibecoding on`, or when the current turn clearly meets the Activation Gate. It is valid only within the current conversation, can be paused/disabled for non-engineering turns or explicit off commands, and can be reactivated when activation conditions are met again. It enforces concise, reliable implementation guidance, stack direction options, and existing-architecture-first changes.'
 ---
 
 # vibecoding-optimization
 This is a skill focused on programming tasks, designed to improve the vibecoding development experience and enhance code reliability, readability, and maintainability.
 
 ## Applicable Scenarios
-This skill applies to any programming-related task. As long as the user submits a programming-related request, it is automatically activated and provides optimization suggestions and implementation plans.  
-It can also be manually activated with either command: `"/vibecoding-optimization on"` or `"/vibecoding on"`.
+This skill is **not always-on by default**. It should be activated only when one of the following conditions is met:
+1. The user explicitly enables it with `"/vibecoding-optimization on"` or `"/vibecoding on"`.
+2. The request clearly has implementation intent (for example: modify code, fix errors, implement features, refactor code, write tests, or update project configuration).
+
+Do not activate this skill for casual chat, greetings, generic Q&A, plain translation, or non-engineering writing tasks.
 
 ## Continuous Effect
-This skill remains active in every subsequent response and will not be automatically disabled across turns, unless the user is no longer working on programming tasks or explicitly requests deactivation.  
-Examples: `"Stop using vibecoding-optimization skills."`, `"/vibecoding-optimization off"`, or `"/vibecoding off"`.
+Once activated, this skill is valid only for the current conversation session.
+
+Session-scope behavior:
+1. The skill state does not persist across new conversations.
+2. If context is compressed/summarized and activation state is uncertain, treat the skill as inactive by default.
+3. In ambiguous state, reactivate only when the user explicitly enables it again (`"/vibecoding-optimization on"` or `"/vibecoding on"`) or the current turn clearly meets the Activation Gate.
+
+Auto-disable conditions (within this conversation):
+1. The user switches to document/chat/translation/general discussion tasks.
+2. The user explicitly disables it: `"Stop using vibecoding-optimization skills."`, `"/vibecoding-optimization off"`, or `"/vibecoding off"`.
+
+Reactivation rule:
+- After being stopped or auto-disabled, this skill may be reactivated in the same conversation whenever activation conditions are met again (explicit `on` command or current turn satisfies the Activation Gate).
 
 ## Rules
 1. In trial scenarios, strictly follow the rules below to ensure consistency and high quality.
 2. The rules include: programming task handling rules, output content rules, technology stack recommendation rules, security and vulnerability handling rules, and task routing guidelines.
-3. These rules must always be followed unless the user explicitly requests disabling this skill.
+3. These rules apply only after activation conditions are met, and must be paused/disabled when auto-disable conditions are met.
 4. Output should be concise, clear, and readable.
+
+### Activation Gate
+- Activate only when **both** are true:
+	1. The task is code-execution-oriented (implementing, modifying, debugging, testing, or architecture-level engineering decision).
+	2. The expected output includes engineering artifacts (code changes, patches, runnable commands, or configuration updates).
+- Do **not** activate for: casual conversation, greetings, broad conceptual discussion without implementation, pure translation, pure summarization, or non-engineering writing.
+- Borderline case: if the user only asks for explanation without implementation, keep this skill inactive by default.
 
 ## Programming Task Handling Rules
 - Generated code must follow best practices and style conventions of mainstream programming languages.
