@@ -30,7 +30,7 @@ Reactivation rule:
 
 ## Rules
 1. In trial scenarios, strictly follow the rules below to ensure consistency and high quality.
-2. The rules include: programming task handling rules, output content rules, technology stack recommendation rules, security and vulnerability handling rules, and task routing guidelines.
+2. The rules include: programming task handling rules, technology stack recommendation rules, security and vulnerability handling rules, and task routing guidelines.
 3. These rules apply only after activation conditions are met, and must be paused/disabled when auto-disable conditions are met.
 4. Output should be concise, clear, and readable.
 
@@ -40,6 +40,7 @@ Reactivation rule:
 	2. The expected output includes engineering artifacts (code changes, patches, runnable commands, or configuration updates).
 - Do **not** activate for: casual conversation, greetings, broad conceptual discussion without implementation, pure translation, pure summarization, or non-engineering writing.
 - Borderline case: if the user only asks for explanation without implementation, keep this skill inactive by default.
+- Code review: activate only when the review involves concrete output artifacts (e.g., inline comments, patch suggestions, refactored code); pure reading without output does not activate.
 
 ## Programming Task Handling Rules
 - Generated code must follow best practices and style conventions of mainstream programming languages.
@@ -49,7 +50,19 @@ Reactivation rule:
 - Without explicit instruction, implementation must respect the constraints of “no large-scale architectural changes” and “no changes to existing code style.”
 - If a requirement cannot be fulfilled, clearly explain why, provide alternatives, and only proceed after obtaining user consent.
 - Do not output follow-up prompts like “Do you need xx?”; iterate directly to a complete and executable result.
-- Comments must be clear, accurate, and only include necessary information; avoid over-commenting or unrelated content, and write comments in the user’s language.
+- Comments must be clear, accurate, and only include necessary information; avoid over-commenting or unrelated content, and write comments in the user’s language.### Testing Strategy
+- **New projects**: include a test setup (test framework + sample test) in the initial scaffolding output, unless the user explicitly declines.
+- **Existing projects**: when adding or modifying functionality, generate corresponding unit tests if a test framework is already present in the project. If no test framework exists, suggest adding one but do not force it.
+- **Bug fixes**: include a regression test that reproduces the original bug and verifies the fix.
+- Test scope priority: unit tests > integration tests > E2E tests. Start with the most targeted level.
+- Do not generate trivial tests (e.g., testing that a constant equals itself). Every test must verify meaningful behavior.
+
+### Error Recovery Strategy
+When an implementation path is blocked mid-way:
+1. **Stop and report** — explain what failed and why, do not silently switch approaches.
+2. **Propose alternatives** — list 1–3 alternative approaches with trade-offs.
+3. **Rollback guidance** — if partial changes were already applied, provide clear instructions (or commands) to revert them.
+4. **Proceed only with consent** — apply the alternative only after the user confirms.
 
 ## Technology Stack Recommendation Rules
 Before implementation, provide optional directions (choose one based on the task, or present multiple in parallel):
@@ -58,12 +71,46 @@ Before implementation, provide optional directions (choose one based on the task
 - **High Performance**: focused on throughput/latency/resource usage, with acceptance of higher implementation complexity.
 - Recommend appropriate technology stack directions based on user requirements and project type, and explain the reasons.
 
+### Stack Direction Quick-Reference (by domain)
+
+| Domain | Simple & Fast | Maintainable | High Performance |
+|--------|--------------|--------------|------------------|
+| **Frontend (React)** | Vite + React + Tailwind | Next.js + Zustand + TanStack Query | Next.js SSR + streaming + edge runtime |
+| **Frontend (Vue)** | Vite + Vue 3 + Pinia | Nuxt 3 + VueUse + Pinia | Nuxt 3 + Nitro edge + virtual list |
+| **Backend (Node.js)** | Express / Hono | NestJS / Fastify + Prisma | Fastify + Drizzle + Redis caching |
+| **Backend (Python)** | Flask / FastAPI (minimal) | FastAPI + SQLAlchemy + Pydantic | FastAPI + async DB + Celery workers |
+| **Backend (Go)** | net/http + stdlib | Gin / Echo + GORM | Fiber + pgx + connection pooling |
+| **Backend (Java)** | Spring Boot (minimal) | Spring Boot + JPA + Flyway | Quarkus + virtual threads + reactive |
+| **Backend (Rust)** | Axum (minimal) | Axum + SQLx + tower layers | Actix-web + SQLx + tokio tuning |
+| **CLI Tool** | Single-file script | Commander (Node) / Click (Python) + config file | Compiled binary (Go / Rust) |
+
+> This table is a starting point. Always adapt to the user's actual constraints and preferences.
+
 ## Security and Vulnerability Handling Rules
 - Do not directly modify code when vulnerabilities are found.
 - First explain the risk, impact scope, and recommended solution.
 - Apply fixes only after obtaining user consent.
 
+### Common Vulnerability Checklist
+When reviewing or generating code, proactively check for:
+- **Injection** (SQL/NoSQL/OS command): use parameterized queries and avoid string interpolation for user input.
+- **XSS**: sanitize/escape all user-provided content rendered in HTML; use framework-native escaping (React JSX auto-escapes, Vue `v-text` auto-escapes; watch out for `dangerouslySetInnerHTML` / `v-html`).
+- **Secrets management**: never hardcode API keys, tokens, or passwords. Use environment variables or a secret manager. Verify `.env` files are in `.gitignore`.
+- **Auth & access control**: validate permissions server-side for every protected operation; never rely on client-side checks alone.
+- **Dependency risks**: flag known-vulnerable packages when spotted; recommend `npm audit` / `pip audit` / `govulncheck` as part of CI.
+
 ## Task Routing
+
+Route each incoming task to the appropriate handling guideline based on the following signals:
+
+| Signal | Route to |
+|--------|----------|
+| User mentions "new project", "start from scratch", "create a project" | New Project Handling Guidelines |
+| User references existing files, repo, or codebase | Existing Project Modification Guidelines |
+| User asks to fix a bug / add a feature to current code | Existing Project Modification Guidelines |
+| User asks for a code review or audit | Existing Project Modification Guidelines |
+| User asks to add a new module/package within an existing repo | Hybrid: follow New Project Guidelines for the new module, but respect Existing Project constraints for integration |
+| Task type is ambiguous | Ask one clarifying question: "Is this a new project or an existing codebase?" |
 
 ## New Project Handling Guidelines
 Ask first, and ask only the following questions:
@@ -72,10 +119,29 @@ Ask first, and ask only the following questions:
 3. What are your specific requirements?
 4. Would you like me to provide optional technology stack directions first (Simple & Fast / Maintainable / High Performance)?
 
-After receiving answers, provide stack options first, then output implementation content.
+After receiving answers, provide stack options first, then output implementation content in the following order:
+1. **Directory structure** — recommended file/folder layout.
+2. **Dependency list** — package manager file (e.g., `package.json`, `requirements.txt`).
+3. **Core file skeletons** — entry point and key module stubs with inline comments.
+4. **Start command** — exact runnable command to launch or test the project.
 
 ## Existing Project Modification Guidelines
 1. Read and understand the current code structure and constraints first.
 2. Implement within the existing architecture; no large-scale refactoring.
 3. Without explicit requirements, do not change the existing code style (keep naming, formatting, and organization consistent).
 4. Output changes should be concise, readable, and compatible with the existing structure.
+5. Before applying changes, briefly assess the impact scope (which files/modules are affected, any downstream consumers), and mention it in the output so the user is aware.
+
+## Domain-Specific Extensions
+
+> **Lazy-loading rule**: Do NOT read any reference file unless the current task matches. When a task matches, load ONLY the entry-point file first (the router), then follow its routing table to load the minimal sub-file(s) needed.
+
+### Frontend Tasks
+- **Entry point**: `references/frontend.md` (routing table only, ~25 lines)
+- **Sub-files**: `references/frontend/react.md`, `references/frontend/vue.md`, `references/frontend/design.md`, `references/frontend/fundamentals.md`
+- **When to load**: task involves web UI, CSS, components, frameworks (React/Vue/Next.js/Nuxt), or browser APIs.
+
+### Backend Tasks
+- **Entry point**: `references/backend.md` (routing table only, ~40 lines)
+- **Sub-files**: `references/backend/nodejs.md`, `references/backend/python.md`, `references/backend/go.md`, `references/backend/java.md`, `references/backend/rust.md`, `references/backend/fundamentals.md`
+- **When to load**: task involves server-side code, APIs, databases, authentication, or deployment.

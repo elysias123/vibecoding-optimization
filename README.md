@@ -12,5 +12,5 @@ npx skills elysias123/vibecoding-optimization
 
 ## Usage
 
-- Automatically loads during programming development and related tasks
+- Automatically activates during programming development tasks
 - Use `/vibecoding <on/off>` or `/vibecoding-optimization <on/off>` to control it
