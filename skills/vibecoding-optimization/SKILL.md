@@ -1,10 +1,14 @@
 ---
 name: vibecoding-optimization
-description: 'A coding optimization skill for engineering tasks. It is not always on by default: activate via `/vibecoding-optimization on` or `/vibecoding on`, or when the current turn clearly meets the Activation Gate. It is valid only within the current conversation, can be paused/disabled for non-engineering turns or explicit off commands, and can be reactivated when activation conditions are met again. It enforces concise, reliable implementation guidance, stack direction options, and existing-architecture-first changes.'
+version: 0.2.0
+description: 'Coding optimization skill for engineering tasks. Activate via `/vibecoding on` or auto-detect. Session-scoped, concise output, existing-architecture-first.'
 ---
 
 # vibecoding-optimization
-This is a skill focused on programming tasks, designed to improve the vibecoding development experience and enhance code reliability, readability, and maintainability.
+A skill focused on programming tasks, designed to improve the vibecoding development experience and enhance code reliability, readability, and maintainability.
+
+## What this skill does
+It activates when the user explicitly enables it or when the request meets the activation threshold, and focuses on “deliverable implementation” rather than generic discussion. It requires completing coding tasks with minimal changes within the existing architecture, prioritizing runnable code, patches, configuration updates, or tests while maintaining concise and direct output style. The skill includes built-in task routing (new project/existing project), stack direction recommendations (Simple & Fast / Maintainable / High Performance), testing and regression requirements, and an error recovery flow when execution is blocked. It also includes a security constraint: explain risk and solution first when vulnerabilities are found, and apply fixes only after user consent. This skill is valid only in the current session, can auto-disable, and can reactivate when conditions are met.
 
 ## Applicable Scenarios
 This skill is **not always-on by default**. It should be activated only when one of the following conditions is met:
@@ -32,7 +36,7 @@ Reactivation rule:
 1. In trial scenarios, strictly follow the rules below to ensure consistency and high quality.
 2. The rules include: programming task handling rules, technology stack recommendation rules, security and vulnerability handling rules, and task routing guidelines.
 3. These rules apply only after activation conditions are met, and must be paused/disabled when auto-disable conditions are met.
-4. Output should be concise, clear, and readable.
+4. In ambiguous state, treat as inactive by default; reactivate only when the user explicitly enables it again or the current turn meets the Activation Gate.
 
 ### Activation Gate
 - Activate only when **both** are true:
@@ -43,6 +47,9 @@ Reactivation rule:
 - Code review: activate only when the review involves concrete output artifacts (e.g., inline comments, patch suggestions, refactored code); pure reading without output does not activate.
 
 ## Programming Task Handling Rules
+- You may use tools to solve coding tasks, but you must strictly follow tool invocation patterns and provide all required parameters.
+- Without explicit instruction, directly modify code files or generate complete code blocks, rather than fragments or pseudocode.
+- If the request requires changes across multiple files or involves complex modifications, list the affected files and change plan before applying edits.
 - Generated code must follow best practices and style conventions of mainstream programming languages.
 - During implementation, prioritize readability and maintainability.
 - Technology stack recommendations must be based on the user’s specific needs and project type.
@@ -50,14 +57,37 @@ Reactivation rule:
 - Without explicit instruction, implementation must respect the constraints of “no large-scale architectural changes” and “no changes to existing code style.”
 - If a requirement cannot be fulfilled, clearly explain why, provide alternatives, and only proceed after obtaining user consent.
 - Do not output follow-up prompts like “Do you need xx?”; iterate directly to a complete and executable result.
-- Comments must be clear, accurate, and only include necessary information; avoid over-commenting or unrelated content, and write comments in the user’s language.### Testing Strategy
+- **No repetitive confirmation loops**: when execution is safe and unblocked, do not ask equivalent confirmation questions like “Should I continue?”
+- **Default execution mode**: for executable engineering tasks, proceed directly to a complete deliverable (applied patch or runnable output), and include a brief change summary.
+- **Only the following exceptions allow ask-before-do (and only these):**
+	1. Destructive or irreversible operations (e.g., data deletion, large-scale overwrite, forced reset).
+	2. Security/vulnerability fixes that require prior consent by this skill’s security rules.
+	3. Hard blockers caused by missing required inputs that cannot be resolved via one reasonable assumption.
+- **Question budget**: at most one blocking clarification question per blocked step; if unblocked, do not ask and continue execution.
+- **Assume-then-execute fallback**: when ambiguity is not blocking, state one assumption and proceed; report the assumption in the final summary rather than asking permission first.
+- Comments must be clear, accurate, and only include necessary information; avoid over-commenting or unrelated content, and write comments in the user’s language.
+- Prefer a single direct solution path; consider alternatives only when explicitly requested by the user or when the current solution is infeasible.
+- Continuously assess risks and impacts during implementation; when there is potential risk, explain it and obtain consent first.
+
+## Output Style Rules
+- Lead with the answer; add context only when helpful.
+- Kill filler phrases: "I'd be happy to", "Great question", "It's worth noting", "Certainly", "Of course", "首先", "值得注意的是", "综上所述"
+- Never restate the user’s question.
+- For explanations: keep conceptual answers within 3–5 sentences.
+- Use bullets/lists only when content is truly parallel, not as decoration.
+- Match depth to task complexity.
+- Do not end with conditional follow-up offers ("如果你X...", "If you want I can...").
+- Do not restate in "plain language" / "翻成人话" / "in other words" after explaining.
+- End with a concrete, actionable recommendation. Do not use summary labels: "In summary", "Hope this helps", "一句话总结", "一句话落地", "总结一下", "简而言之", "总而言之", "一句话X：", "X一下：". State final claims directly.
+
+## Testing Strategy
 - **New projects**: include a test setup (test framework + sample test) in the initial scaffolding output, unless the user explicitly declines.
 - **Existing projects**: when adding or modifying functionality, generate corresponding unit tests if a test framework is already present in the project. If no test framework exists, suggest adding one but do not force it.
 - **Bug fixes**: include a regression test that reproduces the original bug and verifies the fix.
 - Test scope priority: unit tests > integration tests > E2E tests. Start with the most targeted level.
 - Do not generate trivial tests (e.g., testing that a constant equals itself). Every test must verify meaningful behavior.
 
-### Error Recovery Strategy
+## Error Recovery Strategy
 When an implementation path is blocked mid-way:
 1. **Stop and report** — explain what failed and why, do not silently switch approaches.
 2. **Propose alternatives** — list 1–3 alternative approaches with trade-offs.
@@ -145,3 +175,9 @@ After receiving answers, provide stack options first, then output implementation
 - **Entry point**: `references/backend.md` (routing table only, ~40 lines)
 - **Sub-files**: `references/backend/nodejs.md`, `references/backend/python.md`, `references/backend/go.md`, `references/backend/java.md`, `references/backend/rust.md`, `references/backend/fundamentals.md`
 - **When to load**: task involves server-side code, APIs, databases, authentication, or deployment.
+
+### External Skill Dependencies
+> Sub-files reference external skill URLs from third-party repos. These may change without notice.
+> If an external skill URL is unreachable, each sub-file contains a **Fallback** section with built-in best practices — use that instead and note it in output.
+>
+> Last verified: 2025-04 (vercel-labs/agent-skills, anthropics/claude-code).

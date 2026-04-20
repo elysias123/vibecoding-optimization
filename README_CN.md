@@ -14,3 +14,10 @@ npx skills elysias123/vibecoding-optimization
 
 - 在进行编程开发等相关任务时自动激活
 - 使用 `/vibecoding <on/off>` 或 `/vibecoding-optimization <on/off>` 控制
+
+## 致谢
+
+- [vuejs-ai/skills](https://github.com/vuejs-ai/skills)
+- [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)
+- [anthropics/claude-code](https://github.com/anthropics/claude-code)
+- [hexiecs/talk-normally](https://github.com/hexiecs/talk-normal)
