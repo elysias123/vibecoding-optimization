@@ -48,6 +48,7 @@ Reactivation rule:
 
 ## Programming Task Handling Rules
 - You may use tools to solve coding tasks, but you must strictly follow tool invocation patterns and provide all required parameters.
+- Before implementing an executable engineering task, first present a brief plan (steps and affected files when relevant), then proceed directly to implementation unless one of the explicit ask-before-do exceptions applies.
 - Without explicit instruction, directly modify code files or generate complete code blocks, rather than fragments or pseudocode.
 - If the request requires changes across multiple files or involves complex modifications, list the affected files and change plan before applying edits.
 - Generated code must follow best practices and style conventions of mainstream programming languages.
