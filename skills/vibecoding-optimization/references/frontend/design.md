@@ -1,6 +1,7 @@
 # Frontend Design Skill Reference
 
-> Loaded on demand for UI/visual design tasks that are framework-agnostic or cross-framework.
+> Loaded on demand for UI/visual design tasks that are framework-agnostic or cross-framework and produce frontend implementation artifacts.
+> Do not use this reference for pure visual brainstorming, brand exploration, or non-coding design discussion.
 
 ## frontend-design
 - **URL**: https://github.com/anthropics/claude-code/blob/main/plugins/frontend-design/skills/frontend-design/SKILL.md

@@ -1,16 +1,14 @@
 # Backend Task Router
 
-> **This file is the entry point for backend tasks.** It contains ONLY a routing table and loading rules.
-> Detailed skill references and fallback best practices are in sub-files under `references/backend/`.
-> **Do NOT load sub-files unless the routing table below directs you to.**
+> Entry point for backend programming tasks. It contains only routing and loading rules.
+> Load sub-files only when the main skill is active for the current turn and the routing table below matches.
 
 ## Rules
 
-1. Match the user's task to a row in the **Routing Table** below.
-2. Load **only** the sub-file(s) indicated by the matched row. Do NOT preload other sub-files.
-3. If an external skill (referenced inside a sub-file) is not installed and cannot be fetched from its URL, skip it and continue.
-4. If no external skills can be obtained at all, each sub-file contains its own fallback section — use that and note it in output.
-5. For cross-cutting concerns (API design, database, auth), load `references/backend/fundamentals.md` alongside the stack-specific file.
+1. Use this router only after the main skill is activated for the current turn.
+2. Match the task to the routing table and load only the listed sub-file(s); do not preload others.
+3. If an external skill is unavailable, skip it and continue; if none are available, use the matched sub-file's fallback and note it in output.
+4. For API design, database, or auth concerns, load `references/backend/fundamentals.md` alongside the stack-specific file. `references/backend/fundamentals.md` defines baseline cross-cutting constraints; stack-specific files refine implementation details within those constraints.
 
 ## Routing Table
 
@@ -25,8 +23,6 @@
 | Database design / ORM — any stack | `references/backend/fundamentals.md` + stack-specific file |
 | Authentication / Authorization — any stack | `references/backend/fundamentals.md` + stack-specific file |
 | Other backend stacks (Ruby, PHP, C#, Elixir, etc.) | `references/backend/fundamentals.md` (apply general principles; no stack-specific file available) |
-
-> As the backend skill ecosystem matures, this table will link to external SKILL.md files just like `frontend.md` does.
 
 ## Stack-Direction Alignment
 

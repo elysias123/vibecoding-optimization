@@ -11,40 +11,47 @@ A skill focused on programming tasks, designed to improve the vibecoding develop
 It activates when the user explicitly enables it or when the request meets the activation threshold, and focuses on “deliverable implementation” rather than generic discussion. It requires completing coding tasks with minimal changes within the existing architecture, prioritizing runnable code, patches, configuration updates, or tests while maintaining concise and direct output style. The skill includes built-in task routing (new project/existing project), stack direction recommendations (Simple & Fast / Maintainable / High Performance), testing and regression requirements, and an error recovery flow when execution is blocked. It also includes a security constraint: explain risk and solution first when vulnerabilities are found, and apply fixes only after user consent. This skill is valid only in the current session, can auto-disable, and can reactivate when conditions are met.
 
 ## Applicable Scenarios
-This skill is **not always-on by default**. It should be activated only when one of the following conditions is met:
+This skill is **not always-on by default**. Activate it only when one of the following conditions is met:
 1. The user explicitly enables it with `"/vibecoding-optimization on"` or `"/vibecoding on"`.
-2. The request clearly has implementation intent (for example: modify code, fix errors, implement features, refactor code, write tests, or update project configuration).
+2. The current turn is clearly a programming task with implementation intent (for example: modify code, fix errors, implement features, refactor code, write tests, or update project configuration).
 
-Do not activate this skill for casual chat, greetings, generic Q&A, plain translation, or non-engineering writing tasks.
+Do not activate this skill for casual chat, greetings, generic Q&A, translation, summarization, non-engineering writing, or any request that is not specifically about programming work. Explicit enable does not override these exclusions, and unrelated turns remain inactive even within the same session.
 
 ## Continuous Effect
-Once activated, this skill is valid only for the current conversation session.
+Once activated, this skill is available only within the current conversation session.
 
 Session-scope behavior:
 1. The skill state does not persist across new conversations.
 2. If context is compressed/summarized and activation state is uncertain, treat the skill as inactive by default.
-3. In ambiguous state, reactivate only when the user explicitly enables it again (`"/vibecoding-optimization on"` or `"/vibecoding on"`) or the current turn clearly meets the Activation Gate.
-
-Auto-disable conditions (within this conversation):
-1. The user switches to document/chat/translation/general discussion tasks.
-2. The user explicitly disables it: `"Stop using vibecoding-optimization skills."`, `"/vibecoding-optimization off"`, or `"/vibecoding off"`.
+3. The skill is session-available but turn-gated: it applies only to turns that satisfy the Activation Gate.
+4. It becomes inactive on document/chat/translation/general discussion turns, on any turn that is not about programming implementation, code modification, debugging, testing, or engineering configuration, or when the user explicitly disables it with `"Stop using vibecoding-optimization skills."`, `"/vibecoding-optimization off"`, or `"/vibecoding off"`.
 
 Reactivation rule:
-- After being stopped or auto-disabled, this skill may be reactivated in the same conversation whenever activation conditions are met again (explicit `on` command or current turn satisfies the Activation Gate).
+- After being stopped or auto-disabled, this skill may be reactivated in the same conversation whenever activation conditions are met again for programming work (explicit `on` command or current turn satisfies the Activation Gate).
 
 ## Rules
-1. In trial scenarios, strictly follow the rules below to ensure consistency and high quality.
-2. The rules include: programming task handling rules, technology stack recommendation rules, security and vulnerability handling rules, and task routing guidelines.
-3. These rules apply only after activation conditions are met, and must be paused/disabled when auto-disable conditions are met.
-4. In ambiguous state, treat as inactive by default; reactivate only when the user explicitly enables it again or the current turn meets the Activation Gate.
+1. Follow the rules below only after activation conditions are met.
+2. They cover programming task handling, technology stack recommendation, security and vulnerability handling, and task routing.
+3. Pause or disable them whenever the auto-disable conditions above are met.
+4. In ambiguous state, treat the skill as inactive by default.
+
+### Priority and Scope Resolution
+- Activation is evaluated per turn within the current session.
+- Explicit enable does not override non-programming exclusions.
+- Task routing and domain-specific reference loading apply only after the skill is activated for the current turn.
+- For existing projects, the “existing-architecture-first” constraint takes precedence over stack-direction recommendations unless the user explicitly asks for broader architectural change.
 
 ### Activation Gate
 - Activate only when **both** are true:
-	1. The task is code-execution-oriented (implementing, modifying, debugging, testing, or architecture-level engineering decision).
-	2. The expected output includes engineering artifacts (code changes, patches, runnable commands, or configuration updates).
-- Do **not** activate for: casual conversation, greetings, broad conceptual discussion without implementation, pure translation, pure summarization, or non-engineering writing.
-- Borderline case: if the user only asks for explanation without implementation, keep this skill inactive by default.
-- Code review: activate only when the review involves concrete output artifacts (e.g., inline comments, patch suggestions, refactored code); pure reading without output does not activate.
+	1. The current turn is specifically about programming work and is code-execution-oriented (implementing, modifying, debugging, testing, or updating engineering configuration).
+	2. The expected output includes engineering artifacts (code changes, patches, runnable commands, tests, schema migrations, or configuration updates).
+- Do **not** activate for: casual conversation, greetings, broad conceptual discussion without implementation, pure translation, pure summarization, non-engineering writing, or general technical Q&A that is not tied to current code, project artifacts, or implementation work.
+- Borderline case: if the user only asks for explanation, discussion, or advice without implementation-oriented programming work on code or project artifacts, keep this skill inactive by default.
+- Code review: activate only when the review is part of programming work on the current codebase and requires concrete output artifacts (e.g., inline comments, patch suggestions, refactored code); pure reading without output does not activate.
+
+### Scope Definitions
+- `Programming work` includes source code, tests, build scripts, CI/CD configuration, schema migrations, infrastructure-as-code, and runtime/project configuration for software projects.
+- `Engineering artifacts` includes patches, code blocks, tests, runnable commands, config changes, schema migrations, and other concrete outputs that can be applied to a software project.
 
 ## Programming Task Handling Rules
 - You may use tools to solve coding tasks, but you must strictly follow tool invocation patterns and provide all required parameters.
@@ -132,6 +139,8 @@ When reviewing or generating code, proactively check for:
 
 ## Task Routing
 
+Apply task routing only after the skill is activated for the current turn.
+
 Route each incoming task to the appropriate handling guideline based on the following signals:
 
 | Signal | Route to |
@@ -144,13 +153,15 @@ Route each incoming task to the appropriate handling guideline based on the foll
 | Task type is ambiguous | Ask one clarifying question: "Is this a new project or an existing codebase?" |
 
 ## New Project Handling Guidelines
-Ask first, and ask only the following questions:
+If required information is missing, ask only the following questions:
 1. What kind of project do you want to build?
 2. Which programming language would you like to use?
 3. What are your specific requirements?
 4. Would you like me to provide optional technology stack directions first (Simple & Fast / Maintainable / High Performance)?
 
-After receiving answers, provide stack options first, then output implementation content in the following order:
+After sufficient input is available, present a brief implementation plan before generating the project output.
+
+Then provide stack options first, followed by implementation content in this order:
 1. **Directory structure** — recommended file/folder layout.
 2. **Dependency list** — package manager file (e.g., `package.json`, `requirements.txt`).
 3. **Core file skeletons** — entry point and key module stubs with inline comments.
@@ -165,7 +176,7 @@ After receiving answers, provide stack options first, then output implementation
 
 ## Domain-Specific Extensions
 
-> **Lazy-loading rule**: Do NOT read any reference file unless the current task matches. When a task matches, load ONLY the entry-point file first (the router), then follow its routing table to load the minimal sub-file(s) needed.
+> **Lazy-loading rule**: Do NOT read any reference file unless the skill is activated for the current turn and the task matches. Start with the entry-point router, then load only the minimal sub-file(s) it selects.
 
 ### Frontend Tasks
 - **Entry point**: `references/frontend.md` (routing table only, ~25 lines)
