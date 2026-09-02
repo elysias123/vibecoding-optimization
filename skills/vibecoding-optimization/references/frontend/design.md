@@ -1,24 +1,22 @@
-# Frontend Design Skill Reference
+# Frontend Design Reference
 
-> Loaded on demand for UI/visual design tasks that are framework-agnostic or cross-framework and produce frontend implementation artifacts.
-> Do not use this reference for pure visual brainstorming, brand exploration, or non-coding design discussion.
+Load for framework-agnostic or cross-framework UI implementation. Do not load for pure visual brainstorming, brand exploration, or non-coding design discussion.
 
-## frontend-design
-- **URL**: https://github.com/anthropics/claude-code/blob/main/plugins/frontend-design/skills/frontend-design/SKILL.md
-- **Summary**: Production-grade frontend interface design, avoiding generic AI aesthetics. Core pillars:
-  - **Design thinking**: goal → tone → constraints → differentiation
-  - **Typography**: avoid generic fonts (Arial/Inter); choose distinctive pairings
-  - **Color & theming**: CSS variable system, primary + accent color strategy
-  - **Motion & micro-interactions**: CSS-only first; Motion library for React
-  - **Spatial composition**: asymmetric layout, overlays, grid-breaking techniques
+## External skill
 
-## Fallback: Design Essentials
+<external-skills>
+  <skill name="frontend-design" url="https://github.com/anthropics/claude-code/blob/main/plugins/frontend-design/skills/frontend-design/SKILL.md">
+    <summary>Use production-grade interface design: derive tone and constraints from goals, choose distinctive typography, define a CSS-variable color system, prefer CSS-first motion, and use deliberate spatial composition.</summary>
+  </skill>
+</external-skills>
 
-> Use when the external skill above is unavailable.
+## Built-in fallback
 
-- Establish a clear visual hierarchy: one primary action per view, muted secondary elements.
-- Use a constrained color palette (1 primary + 1 accent + neutrals). Define as CSS custom properties.
-- Typography: pick max 2 font families. Ensure contrast ratio ≥ 4.5:1 (body) / 3:1 (large text).
-- Spacing: use a consistent scale (e.g., 4px base or Tailwind's default spacing scale).
-- Motion: subtle transitions (150–300ms) on interactive elements. Respect `prefers-reduced-motion`.
-- Avoid decoration without purpose; every visual element should serve UX.
+<fallback-rules>
+  <rule>Establish a clear hierarchy with one primary action per view and muted secondary elements.</rule>
+  <rule>Use one primary color, one accent color, and neutrals through CSS custom properties.</rule>
+  <rule>Use at most two font families and maintain 4.5:1 body or 3:1 large-text contrast.</rule>
+  <rule>Use a consistent spacing scale, such as a 4px base or Tailwind defaults.</rule>
+  <rule>Use subtle 150 to 300ms interaction transitions and honor prefers-reduced-motion.</rule>
+  <rule>Avoid decorative elements without a user-experience purpose.</rule>
+</fallback-rules>

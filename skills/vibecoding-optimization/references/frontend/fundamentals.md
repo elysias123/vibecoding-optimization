@@ -1,36 +1,41 @@
 # Frontend Fundamentals
 
-> Loaded on demand for general frontend questions (CSS, accessibility, performance, TypeScript, build tooling).
-> Framework-agnostic — no external skills required.
+Load for framework-agnostic implementation work involving CSS, accessibility, performance, TypeScript, or build tooling.
 
-## CSS / Styling
-- Prefer CSS variables (Custom Properties) for themes and design tokens.
-- Tailwind CSS: avoid dynamic class concatenation (`bg-${color}-500`); use full class names for build-tool extraction.
-- Global `box-sizing: border-box` reset.
-- Mobile-first responsive: prefer `min-width` media queries.
-- Selector nesting: max 3 levels.
+## Styling
 
-## Accessibility (a11y)
-- Semantic HTML first (`<nav>`, `<main>`, `<article>`, `<button>`); minimize `<div>` abuse.
-- All interactive elements: keyboard-accessible (focus management, tabindex).
-- Images: meaningful `alt` text; decorative images use `alt=""`.
-- Color contrast: WCAG AA minimum (4.5:1 body, 3:1 large text).
-- Motion: provide `prefers-reduced-motion` fallback.
+<styling-rules>
+  <rule>Use CSS custom properties for themes and design tokens.</rule>
+  <rule>With Tailwind, avoid dynamic class concatenation such as bg-${color}-500; use complete class names for extraction.</rule>
+  <rule>Apply a global box-sizing: border-box reset, mobile-first min-width media queries, and no more than three selector nesting levels.</rule>
+</styling-rules>
+
+## Accessibility
+
+<accessibility-rules>
+  <rule>Prefer semantic HTML such as nav, main, article, and button over div-only structures.</rule>
+  <rule>Make every interactive element keyboard-accessible with appropriate focus management.</rule>
+  <rule>Provide meaningful image alt text; use empty alt for decorative images.</rule>
+  <rule>Meet WCAG AA contrast: 4.5:1 for body text and 3:1 for large text.</rule>
+  <rule>Provide a prefers-reduced-motion fallback.</rule>
+</accessibility-rules>
 
 ## Performance
-- Core Web Vitals targets: LCP < 2.5s, INP < 200ms, CLS < 0.1.
-- Images: modern formats (WebP/AVIF), explicit `width`/`height` to prevent CLS.
-- Critical CSS inline; non-critical resources lazy-loaded.
-- Third-party scripts: `async`/`defer`; analytics after hydration.
-- Route-level code splitting as default.
 
-## TypeScript
-- Explicit type interfaces for component props and events.
-- No `any`; use `unknown` + type narrowing.
-- Runtime validation for API responses (Zod or similar).
-- Export public types; keep internal types private.
+<performance-rules>
+  <rule>Target LCP below 2.5s, INP below 200ms, and CLS below 0.1.</rule>
+  <rule>Use WebP or AVIF images with explicit dimensions.</rule>
+  <rule>Inline critical CSS and lazy-load non-critical resources.</rule>
+  <rule>Use async or defer for third-party scripts and load analytics after hydration.</rule>
+  <rule>Use route-level code splitting by default.</rule>
+</performance-rules>
 
-## Build Tooling
-- Vite: recommended general-purpose build tool (React/Vue/Svelte).
-- Next.js: Turbopack (dev) / Webpack (prod) built-in.
-- Tree shaking: ESM imports, avoid barrel-file side effects.
+## TypeScript and tooling
+
+<tooling-rules>
+  <rule>Define explicit types for component props and events; avoid any in favor of unknown with narrowing.</rule>
+  <rule>Validate API responses at runtime with Zod or an equivalent.</rule>
+  <rule>Export public types and keep internal types private.</rule>
+  <rule>Use Vite as the general-purpose React, Vue, or Svelte toolchain; use Next.js built-ins for Next.js.</rule>
+  <rule>Use ESM imports and avoid barrel-file side effects to preserve tree shaking.</rule>
+</tooling-rules>

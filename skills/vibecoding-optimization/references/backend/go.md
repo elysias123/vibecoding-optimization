@@ -1,19 +1,19 @@
 # Go Backend Reference
 
-> Loaded on demand when the task involves Go backend (net/http, Gin, Echo, Fiber).
+Load for Go backend work using net/http, Gin, Echo, or Fiber.
 
-## External Skills
+<external-skills><status>No curated external skills are available. Use the built-in fallback.</status></external-skills>
 
-> No curated agent skills available yet. As the ecosystem matures, external skill URLs will be added here.
+## Built-in fallback
 
-## Fallback: Go Best Practices
-
-- **Framework choice**: net/http (stdlib, zero deps), Gin/Echo (middleware ecosystem), Fiber (Express-like API).
-- **Project structure**: `cmd/` (entry points), `internal/` (private packages), `pkg/` (public libraries). Follow golang-standards/project-layout as a starting reference.
-- **Error handling**: return `error` as last return value; wrap errors with `fmt.Errorf("context: %w", err)`. No panic in library code.
-- **Database**: `database/sql` + pgx (PostgreSQL) or GORM (convenience). Use `sqlc` for type-safe queries from SQL.
-- **Auth**: JWT via `golang-jwt/jwt`; middleware-based authentication. Store secrets in environment variables.
-- **Concurrency**: goroutines + channels for parallelism; use `context.Context` for cancellation and timeouts.
-- **Validation**: go-playground/validator struct tags or custom validation middleware.
-- **Testing**: stdlib `testing` package; `testify` for assertions; `httptest` for handler tests.
-- **Build**: `go build` with `-ldflags` for version injection; multi-stage Docker builds for minimal images.
+<fallback-rules>
+  <rule category="Framework">Use net/http for zero dependencies, Gin or Echo for middleware ecosystems, and Fiber for an Express-like API.</rule>
+  <rule category="Structure">Use cmd/ for entry points, internal/ for private packages, and pkg/ for public libraries.</rule>
+  <rule category="Errors">Return error last, wrap with fmt.Errorf("context: %w", err), and never panic in library code.</rule>
+  <rule category="Database">Use database/sql with pgx for PostgreSQL, GORM for convenience, or sqlc for type-safe SQL.</rule>
+  <rule category="Auth">Use golang-jwt/jwt with middleware authentication; keep secrets in environment variables.</rule>
+  <rule category="Concurrency">Use goroutines and channels; pass context.Context for cancellation and timeouts.</rule>
+  <rule category="Validation">Use go-playground/validator tags or custom validation middleware.</rule>
+  <rule category="Testing">Use testing, optionally testify for assertions, and httptest for handler tests.</rule>
+  <rule category="Build">Use go build with ldflags for version injection and multi-stage Docker builds.</rule>
+</fallback-rules>

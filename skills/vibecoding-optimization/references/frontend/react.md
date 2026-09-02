@@ -1,67 +1,41 @@
-# React / React Native Skill References
+# React and React Native Skill References
 
-> Loaded on demand when the task involves React, Next.js, or React Native.
+Load for React, Next.js, or React Native work. Match the first applicable route and load additional skills only when the task explicitly spans multiple concerns.
 
-## Skill Selector
+## Skill selector
 
-Match the task to the **first applicable row**, then load only that skill. Load additional skills only if the task explicitly spans multiple concerns.
+<skill-selector>
+  <route when="new React or Next.js project" skill="react-best-practices" priority="CRITICAL" />
+  <route when="React performance optimization" skill="react-best-practices" scope="CRITICAL and HIGH rules only" priority="CRITICAL" />
+  <route when="component API design or refactor" skill="composition-patterns" priority="HIGH" />
+  <route when="page or route transition animation" skill="react-view-transitions" priority="MEDIUM" />
+  <route when="React Native or Expo app" skill="react-native-skills" priority="CRITICAL" />
+</skill-selector>
 
-| Task signal | Skill to load | Priority |
-|-------------|---------------|----------|
-| New React/Next.js project | react-best-practices | CRITICAL |
-| Performance optimization | react-best-practices (CRITICAL/HIGH rules only) | CRITICAL |
-| Component API design / refactor | composition-patterns | HIGH |
-| Page/route transition animations | react-view-transitions | MEDIUM |
-| React Native / Expo mobile app | react-native-skills | CRITICAL |
+## External skills
 
----
+<external-skills>
+  <skill name="react-best-practices" source="Vercel engineering" url="https://github.com/vercel-labs/agent-skills/blob/main/skills/react-best-practices/SKILL.md">
+    <summary>Priorities: eliminate async waterfalls and optimize bundle size (CRITICAL); server performance (HIGH); client fetching, rerenders, rendering, JavaScript performance, and advanced patterns.</summary>
+  </skill>
+  <skill name="composition-patterns" url="https://github.com/vercel-labs/agent-skills/blob/main/skills/composition-patterns/SKILL.md">
+    <summary>Build scalable component APIs: avoid boolean-prop proliferation, use compound components and clear variants, decouple state with providers, and apply React 19 APIs appropriately.</summary>
+  </skill>
+  <skill name="react-view-transitions" url="https://github.com/vercel-labs/agent-skills/blob/main/skills/react-view-transitions/SKILL.md">
+    <summary>Use the View Transition API for enter, exit, update, directional navigation, and shared-element animation. Trigger transitions through supported React scheduling APIs.</summary>
+  </skill>
+  <skill name="react-native-skills" url="https://github.com/vercel-labs/agent-skills/blob/main/skills/react-native-skills/SKILL.md">
+    <summary>Prioritize list performance, GPU-friendly animation, native navigation, UI patterns, state, rendering, monorepos, and configuration.</summary>
+  </skill>
+</external-skills>
 
-## react-best-practices
-- **URL**: https://github.com/vercel-labs/agent-skills/blob/main/skills/react-best-practices/SKILL.md
-- **Source**: Vercel engineering
-- **Summary**: 70 rules, 8 priority groups by impact:
-  1. Eliminate async waterfalls [CRITICAL]
-  2. Bundle size optimization [CRITICAL]
-  3. Server performance [HIGH]
-  4. Client data fetching [MEDIUM-HIGH]
-  5. Rerender optimization [MEDIUM]
-  6. Render performance [MEDIUM]
-  7. JS performance [LOW-MEDIUM]
-  8. Advanced patterns [LOW]
+## Built-in fallback
 
-## composition-patterns
-- **URL**: https://github.com/vercel-labs/agent-skills/blob/main/skills/composition-patterns/SKILL.md
-- **Summary**: Scalable component APIs — 4 categories:
-  1. Component architecture [HIGH] — avoid boolean props, compound-component structure
-  2. State management [MEDIUM] — provider decoupling, Context API design
-  3. Implementation patterns [MEDIUM] — explicit variants, children over renderX
-  4. React 19 APIs [MEDIUM] — no forwardRef needed, use() replaces useContext()
-
-## react-view-transitions
-- **URL**: https://github.com/vercel-labs/agent-skills/blob/main/skills/react-view-transitions/SKILL.md
-- **Summary**: View Transition API — `<ViewTransition>` component, animation triggers (enter/exit/update/share), addTransitionType for directional navigation, shared-element morph. Only startTransition/useDeferredValue/Suspense trigger animations. Next.js built-in support.
-
-## react-native-skills
-- **URL**: https://github.com/vercel-labs/agent-skills/blob/main/skills/react-native-skills/SKILL.md
-- **Summary**: 8 categories:
-  1. List performance [CRITICAL] — FlashList, memoize, callback stability
-  2. Animation [HIGH] — GPU properties, useDerivedValue
-  3. Navigation [HIGH] — native stack/tabs
-  4. UI patterns [HIGH] — expo-image, Pressable, SafeArea
-  5. State management [MEDIUM]
-  6. Rendering [MEDIUM]
-  7. Monorepo [MEDIUM]
-  8. Configuration [LOW]
-
----
-
-## Fallback: React Core Best Practices
-
-> Use when all external skills above are unavailable. Note in output: "External skill references unavailable; using built-in React best practices."
-
-- Single-responsibility components; split at ~200 lines.
-- `useMemo`/`useCallback` for expensive computation and callback stability — do not over-memoize.
-- Data fetching: SWR or TanStack Query. Avoid raw `useEffect` + `fetch`.
-- State management progression: component-local → Context → Zustand/Jotai → Redux.
-- Next.js: prefer Server Components; add `'use client'` only for interactivity.
-- Parallelize independent async with `Promise.all()` to avoid waterfalls.
+<fallback-rules>
+  <rule>Use single-responsibility components and split around 200 lines when responsibilities diverge.</rule>
+  <rule>Use useMemo and useCallback for expensive work or callback stability; do not over-memoize.</rule>
+  <rule>Use SWR or TanStack Query for fetching instead of raw useEffect plus fetch.</rule>
+  <rule>Scale state from component-local to Context to Zustand or Jotai to Redux only as needed.</rule>
+  <rule>In Next.js, prefer Server Components and add use client only for interactivity.</rule>
+  <rule>Parallelize independent async work with Promise.all to prevent waterfalls.</rule>
+</fallback-rules>

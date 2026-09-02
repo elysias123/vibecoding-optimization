@@ -1,30 +1,29 @@
 # Frontend Task Router
 
-> Entry point for frontend programming tasks. It contains only routing and loading rules.
-> Load sub-files only when the main skill is active for the current turn and the routing table below matches.
+Use this router only after the main skill is active. Load the smallest matching set of frontend references.
 
-## Rules
+<load-policy>
+  <rule>Match the task, then load only the listed sub-file or files; never preload unrelated references.</rule>
+  <rule>Do not use this router for generic design discussion or frontend Q&amp;A without implementation work.</rule>
+  <rule>When an external skill is unavailable, use the matched file's fallback and state that in the result.</rule>
+</load-policy>
 
-1. Use this router only after the main skill is activated for the current turn.
-2. Match the task to the routing table and load only the listed sub-file(s); do not preload others.
-3. Do not use this router for generic design discussion or general frontend Q&A outside programming work.
-4. If an external skill is unavailable, skip it and continue; if none are available, use the matched sub-file's fallback and note it in output.
+## Routes
 
-## Routing Table
+<routes>
+  <route when="React or Next.js project" load="references/frontend/react.md" />
+  <route when="Vue project" load="references/frontend/vue.md" />
+  <route when="React Native or Expo app" load="references/frontend/react.md" section="React Native" />
+  <route when="framework-agnostic UI or visual implementation" load="references/frontend/design.md" />
+  <route when="CSS, accessibility, performance, TypeScript, or tooling" load="references/frontend/fundamentals.md" />
+  <route when="Svelte, Angular, Solid, or another unsupported framework" load="references/frontend/fundamentals.md" note="Apply general principles." />
+  <route when="multiple frontend concerns" load="All matched files in listed order" note="Skip duplicates." />
+</routes>
 
-| Task signal | Load file |
-|-------------|-----------|
-| React / Next.js project (new or existing) | `references/frontend/react.md` |
-| Vue project (new or existing) | `references/frontend/vue.md` |
-| React Native / Expo mobile app | `references/frontend/react.md` (React Native section) |
-| UI/visual design task that results in frontend implementation artifacts (framework-agnostic) | `references/frontend/design.md` |
-| General frontend implementation question (CSS, a11y, perf, TS, tooling) | `references/frontend/fundamentals.md` |
-| Other frameworks (Svelte, Angular, Solid, etc.) | `references/frontend/fundamentals.md` (apply general principles; no framework-specific skill available) |
-| Task spans multiple areas (e.g., new React project with design focus) | Load matched files in order above, skip duplicates |
+## Stack direction
 
-## Stack-Direction Alignment
-
-When the main SKILL.md suggests a tech-stack direction, apply it **after** loading the relevant sub-file:
-- **Simple & Fast**: use only the core skill from the sub-file; skip advanced/optional skills.
-- **Maintainable**: load core + architecture/patterns skills.
-- **High Performance**: load core + performance-focused rules (CRITICAL/HIGH priority items).
+<stack-alignment>
+  <simple-fast>Load only the core skill from the matched reference and skip optional skills.</simple-fast>
+  <maintainable>Load the core skill and relevant architecture or pattern skills.</maintainable>
+  <high-performance>Load the core skill and its CRITICAL or HIGH performance rules.</high-performance>
+</stack-alignment>

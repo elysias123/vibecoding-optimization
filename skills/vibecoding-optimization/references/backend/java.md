@@ -1,21 +1,21 @@
 # Java Backend Reference
 
-> Loaded on demand when the task involves Java backend (Spring Boot, Quarkus, Micronaut).
+Load for Java backend work using Spring Boot, Quarkus, or Micronaut.
 
-## External Skills
+<external-skills><status>No curated external skills are available. Use the built-in fallback.</status></external-skills>
 
-> No curated agent skills available yet. As the ecosystem matures, external skill URLs will be added here.
+## Built-in fallback
 
-## Fallback: Java Best Practices
-
-- **Framework choice**: Spring Boot (ecosystem, enterprise standard), Quarkus (cloud-native, fast startup), Micronaut (compile-time DI, low memory).
-- **Project structure**: layered packages per domain — `controller/`, `service/`, `repository/`, `dto/`, `entity/`. Use multi-module Maven/Gradle for large projects.
-- **Dependency injection**: prefer constructor injection; avoid field injection with `@Autowired`.
-- **Database**: Spring Data JPA + Hibernate for ORM; jOOQ for type-safe SQL. Use Flyway or Liquibase for migrations.
-- **Validation**: Bean Validation (`@Valid`, `@NotNull`, `@Size`, etc.) on DTOs at controller layer.
-- **Error handling**: `@ControllerAdvice` + `@ExceptionHandler` for global exception handling; return structured error responses.
-- **Auth**: Spring Security for authentication/authorization. Use BCryptPasswordEncoder for password hashing. OAuth2/JWT via `spring-boot-starter-oauth2-resource-server`.
-- **Async**: `@Async` for simple background tasks; Spring WebFlux or virtual threads (Java 21+) for reactive/high-concurrency workloads.
-- **Testing**: JUnit 5 + Mockito for unit tests; `@SpringBootTest` + `MockMvc` for integration tests; Testcontainers for DB integration.
-- **Build**: Maven or Gradle. Use Spring Boot plugin for fat JAR. Multi-stage Docker builds for production images.
-- **Logging**: SLF4J + Logback (Spring Boot default). Use MDC for request-scoped context (request ID, user ID).
+<fallback-rules>
+  <rule category="Framework">Use Spring Boot for ecosystem maturity, Quarkus for cloud-native fast startup, and Micronaut for compile-time DI and lower memory use.</rule>
+  <rule category="Structure">Organize controller/, service/, repository/, dto/, and entity/ by domain; use multi-module Maven or Gradle for large projects.</rule>
+  <rule category="DI">Prefer constructor injection; avoid field injection with @Autowired.</rule>
+  <rule category="Database">Use Spring Data JPA plus Hibernate or jOOQ; use Flyway or Liquibase migrations.</rule>
+  <rule category="Validation">Apply Bean Validation such as @Valid and @NotNull to controller DTOs.</rule>
+  <rule category="Errors">Use @ControllerAdvice and @ExceptionHandler for structured global error responses.</rule>
+  <rule category="Auth">Use Spring Security, BCryptPasswordEncoder, and OAuth2/JWT resource-server support where applicable.</rule>
+  <rule category="Async">Use @Async for simple background work; use WebFlux or Java 21 virtual threads for reactive or high-concurrency work.</rule>
+  <rule category="Testing">Use JUnit 5 and Mockito for units, @SpringBootTest and MockMvc for integration, and Testcontainers for database integration.</rule>
+  <rule category="Build">Use Maven or Gradle with the Spring Boot plugin and multi-stage Docker builds.</rule>
+  <rule category="Logging">Use SLF4J and Logback with MDC request and user context.</rule>
+</fallback-rules>

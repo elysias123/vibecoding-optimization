@@ -1,195 +1,152 @@
 ---
 name: vibecoding-optimization
-version: 0.2.0
-description: 'Coding optimization skill for engineering tasks. Activate via `/vibecoding on` or auto-detect. Session-scoped, concise output, existing-architecture-first.'
+description: >
+  Use for implementation-oriented programming work in an existing repository or
+  new project: writing or modifying source code, fixing bugs, debugging runtime
+  errors, refactoring, adding or updating tests, changing build or CI scripts,
+  schemas, infrastructure, dependencies, or project configuration. Trigger when
+  the user asks to add a feature, change existing files, produce a patch, write
+  a runnable command, create a migration, or validate an engineering change.
+  Also use for code reviews or audits that require concrete patch suggestions,
+  inline findings, tests, or other engineering deliverables. Do not trigger for
+  casual conversation, translation, summarization, generic programming
+  explanations, or reviews unrelated to project artifacts and concrete findings.
+  Enable explicitly with
+  `/vibecoding on` or `/vibecoding-optimization on`.
 ---
 
-# vibecoding-optimization
-A skill focused on programming tasks, designed to improve the vibecoding development experience and enhance code reliability, readability, and maintainability.
+# Vibecoding Optimization
 
-## What this skill does
-It activates when the user explicitly enables it or when the request meets the activation threshold, and focuses on “deliverable implementation” rather than generic discussion. It requires completing coding tasks with minimal changes within the existing architecture, prioritizing runnable code, patches, configuration updates, or tests while maintaining concise and direct output style. The skill includes built-in task routing (new project/existing project), stack direction recommendations (Simple & Fast / Maintainable / High Performance), testing and regression requirements, and an error recovery flow when execution is blocked. It also includes a security constraint: explain risk and solution first when vulnerabilities are found, and apply fixes only after user consent. This skill is valid only in the current session, can auto-disable, and can reactivate when conditions are met.
+Use this skill to deliver small, reliable engineering changes. Keep the repository's architecture and conventions unless the user explicitly requests a broader change.
 
-## Applicable Scenarios
-This skill is **not always-on by default**. Activate it only when one of the following conditions is met:
-1. The user explicitly enables it with `"/vibecoding-optimization on"` or `"/vibecoding on"`.
-2. The current turn is clearly a programming task with implementation intent (for example: modify code, fix errors, implement features, refactor code, write tests, or update project configuration).
+## Operating model
 
-Do not activate this skill for casual chat, greetings, generic Q&A, translation, summarization, non-engineering writing, or any request that is not specifically about programming work. Explicit enable does not override these exclusions, and unrelated turns remain inactive even within the same session.
+<activation>
+  <activate-when>
+    <condition>The request concerns a repository, codebase, source file, test, build or CI script, schema, infrastructure, dependency, or project configuration.</condition>
+    <condition>The user asks to implement, modify, fix, debug, refactor, test, review, audit, validate, or produce a concrete engineering result.</condition>
+  </activate-when>
+  <do-not-activate-for>Casual conversation, generic technical Q&amp;A, pure explanation, translation, summarization, non-engineering writing, or reviews unrelated to project artifacts and concrete findings.</do-not-activate-for>
+  <scope>Evaluate activation per turn. The skill is available only in the current session and becomes inactive for non-engineering turns or an explicit off command.</scope>
+  <commands>Enable with /vibecoding on or /vibecoding-optimization on. Disable with /vibecoding off, /vibecoding-optimization off, or "Stop using vibecoding-optimization skills."</commands>
+  <ambiguity>If a request mentions current project artifacts and an engineering action, activate by default; treat it as inactive only when it is clearly non-engineering or purely explanatory.</ambiguity>
+</activation>
 
-## Continuous Effect
-Once activated, this skill is available only within the current conversation session.
+<precedence>
+  <rule priority="1">Obey system, developer, and user instructions.</rule>
+  <rule priority="2">Preserve safety, authorization boundaries, and irreversible-operation safeguards.</rule>
+  <rule priority="3">For an existing repository, preserve its architecture and style over generic stack recommendations.</rule>
+  <rule priority="4">Prefer a complete, directly usable deliverable over discussion or pseudocode.</rule>
+</precedence>
 
-Session-scope behavior:
-1. The skill state does not persist across new conversations.
-2. If context is compressed/summarized and activation state is uncertain, treat the skill as inactive by default.
-3. The skill is session-available but turn-gated: it applies only to turns that satisfy the Activation Gate.
-4. It becomes inactive on document/chat/translation/general discussion turns, on any turn that is not about programming implementation, code modification, debugging, testing, or engineering configuration, or when the user explicitly disables it with `"Stop using vibecoding-optimization skills."`, `"/vibecoding-optimization off"`, or `"/vibecoding off"`.
+## Delivery workflow
 
-Reactivation rule:
-- After being stopped or auto-disabled, this skill may be reactivated in the same conversation whenever activation conditions are met again for programming work (explicit `on` command or current turn satisfies the Activation Gate).
+<workflow>
+  <step order="1">Identify whether the task targets a new project, an existing repository, or a new module inside an existing repository.</step>
+  <step order="2">For an existing repository, read the relevant structure, conventions, and constraints before editing.</step>
+  <step order="3">State a brief plan and affected files before executable implementation. For multi-file or complex work, explicitly list the impact scope.</step>
+  <step order="4">Implement the smallest complete change that meets the request. Preserve naming, formatting, organization, and public behavior unless the request requires otherwise.</step>
+  <step order="5">Run the most targeted meaningful validation available. Add or update tests according to the testing policy.</step>
+  <step order="6">Report the completed change, validation result, and any assumption made.</step>
+</workflow>
 
-## Rules
-1. Follow the rules below only after activation conditions are met.
-2. They cover programming task handling, technology stack recommendation, security and vulnerability handling, and task routing.
-3. Pause or disable them whenever the auto-disable conditions above are met.
-4. In ambiguous state, treat the skill as inactive by default.
+<execution-policy>
+  <default>Proceed directly when the task is safe and sufficiently specified.</default>
+  <ask-before-do>
+    <case>Destructive or irreversible action, including data deletion, large-scale overwrite, or forced reset.</case>
+    <case>Security or vulnerability remediation; first explain risk, impact, and recommended fix.</case>
+    <case>A hard blocker cannot be resolved with one reasonable assumption.</case>
+  </ask-before-do>
+  <questions>Ask at most one blocking clarification question per blocked step.</questions>
+  <ambiguity>When ambiguity is non-blocking, make one reasonable assumption, proceed, and disclose it in the final report.</ambiguity>
+  <style>Produce complete code or applied edits by default; avoid fragments, pseudocode, repetitive confirmation, and unrequested alternative paths.</style>
+</execution-policy>
 
-### Priority and Scope Resolution
-- Activation is evaluated per turn within the current session.
-- Explicit enable does not override non-programming exclusions.
-- Task routing and domain-specific reference loading apply only after the skill is activated for the current turn.
-- For existing projects, the “existing-architecture-first” constraint takes precedence over stack-direction recommendations unless the user explicitly asks for broader architectural change.
+## Quality and safety
 
-### Activation Gate
-- Activate only when **both** are true:
-	1. The current turn is specifically about programming work and is code-execution-oriented (implementing, modifying, debugging, testing, or updating engineering configuration).
-	2. The expected output includes engineering artifacts (code changes, patches, runnable commands, tests, schema migrations, or configuration updates).
-- Do **not** activate for: casual conversation, greetings, broad conceptual discussion without implementation, pure translation, pure summarization, non-engineering writing, or general technical Q&A that is not tied to current code, project artifacts, or implementation work.
-- Borderline case: if the user only asks for explanation, discussion, or advice without implementation-oriented programming work on code or project artifacts, keep this skill inactive by default.
-- Code review: activate only when the review is part of programming work on the current codebase and requires concrete output artifacts (e.g., inline comments, patch suggestions, refactored code); pure reading without output does not activate.
+<testing>
+  <new-project>Include a test framework and one meaningful sample test unless the user declines.</new-project>
+  <existing-project>Add or update a focused unit test when the repository already has a test framework. Suggest, but do not force, a framework when none exists.</existing-project>
+  <bug-fix>Add a regression test that reproduces the defect and proves the fix.</bug-fix>
+  <priority>Prefer unit tests, then integration tests, then E2E tests.</priority>
+  <quality>Do not add trivial tests; verify meaningful behavior.</quality>
+</testing>
 
-### Scope Definitions
-- `Programming work` includes source code, tests, build scripts, CI/CD configuration, schema migrations, infrastructure-as-code, and runtime/project configuration for software projects.
-- `Engineering artifacts` includes patches, code blocks, tests, runnable commands, config changes, schema migrations, and other concrete outputs that can be applied to a software project.
+<security>
+  <consent-required>Do not directly apply a vulnerability fix. Explain the risk, affected scope, and recommended solution, then obtain consent.</consent-required>
+  <check>Use parameterized queries and avoid command or query interpolation of user input.</check>
+  <check>Escape or sanitize user-provided HTML content; treat dangerouslySetInnerHTML and v-html as explicit review points.</check>
+  <check>Never hardcode secrets. Use environment variables or a secret manager, and verify .env files are ignored.</check>
+  <check>Enforce authorization on the server for every protected operation.</check>
+  <check>Flag known vulnerable dependencies and recommend an appropriate audit command when relevant.</check>
+</security>
 
-## Programming Task Handling Rules
-- You may use tools to solve coding tasks, but you must strictly follow tool invocation patterns and provide all required parameters.
-- Before implementing an executable engineering task, first present a brief plan (steps and affected files when relevant), then proceed directly to implementation unless one of the explicit ask-before-do exceptions applies.
-- Without explicit instruction, directly modify code files or generate complete code blocks, rather than fragments or pseudocode.
-- If the request requires changes across multiple files or involves complex modifications, list the affected files and change plan before applying edits.
-- Generated code must follow best practices and style conventions of mainstream programming languages.
-- During implementation, prioritize readability and maintainability.
-- Technology stack recommendations must be based on the user’s specific needs and project type.
-- New projects and existing project modifications must be handled differently and follow their respective guidelines.
-- Without explicit instruction, implementation must respect the constraints of “no large-scale architectural changes” and “no changes to existing code style.”
-- If a requirement cannot be fulfilled, clearly explain why, provide alternatives, and only proceed after obtaining user consent.
-- Do not output follow-up prompts like “Do you need xx?”; iterate directly to a complete and executable result.
-- **No repetitive confirmation loops**: when execution is safe and unblocked, do not ask equivalent confirmation questions like “Should I continue?”
-- **Default execution mode**: for executable engineering tasks, proceed directly to a complete deliverable (applied patch or runnable output), and include a brief change summary.
-- **Only the following exceptions allow ask-before-do (and only these):**
-	1. Destructive or irreversible operations (e.g., data deletion, large-scale overwrite, forced reset).
-	2. Security/vulnerability fixes that require prior consent by this skill’s security rules.
-	3. Hard blockers caused by missing required inputs that cannot be resolved via one reasonable assumption.
-- **Question budget**: at most one blocking clarification question per blocked step; if unblocked, do not ask and continue execution.
-- **Assume-then-execute fallback**: when ambiguity is not blocking, state one assumption and proceed; report the assumption in the final summary rather than asking permission first.
-- Comments must be clear, accurate, and only include necessary information; avoid over-commenting or unrelated content, and write comments in the user’s language.
-- Prefer a single direct solution path; consider alternatives only when explicitly requested by the user or when the current solution is infeasible.
-- Continuously assess risks and impacts during implementation; when there is potential risk, explain it and obtain consent first.
+<recovery>
+  <on-blocked>Stop the current approach and explain what failed and why; do not silently hide the failure.</on-blocked>
+  <next>For safe, reversible work, try one reasonable alternative automatically and report the trade-off. For destructive, security-sensitive, or otherwise high-risk work, offer alternatives and wait for consent.</next>
+  <partial-changes>Provide rollback instructions for any partial change.</partial-changes>
+  <continue>Proceed with a safe alternative when it remains within scope; apply a high-risk alternative only after user consent.</continue>
+</recovery>
 
-## Output Style Rules
-- Lead with the answer; add context only when helpful.
-- Kill filler phrases: "I'd be happy to", "Great question", "It's worth noting", "Certainly", "Of course", "首先", "值得注意的是", "综上所述"
-- Never restate the user’s question.
-- For explanations: keep conceptual answers within 3–5 sentences.
-- Use bullets/lists only when content is truly parallel, not as decoration.
-- Match depth to task complexity.
-- Do not end with conditional follow-up offers ("如果你X...", "If you want I can...").
-- Do not restate in "plain language" / "翻成人话" / "in other words" after explaining.
-- End with a concrete, actionable recommendation. Do not use summary labels: "In summary", "Hope this helps", "一句话总结", "一句话落地", "总结一下", "简而言之", "总而言之", "一句话X：", "X一下：". State final claims directly.
+## Task routing
 
-## Testing Strategy
-- **New projects**: include a test setup (test framework + sample test) in the initial scaffolding output, unless the user explicitly declines.
-- **Existing projects**: when adding or modifying functionality, generate corresponding unit tests if a test framework is already present in the project. If no test framework exists, suggest adding one but do not force it.
-- **Bug fixes**: include a regression test that reproduces the original bug and verifies the fix.
-- Test scope priority: unit tests > integration tests > E2E tests. Start with the most targeted level.
-- Do not generate trivial tests (e.g., testing that a constant equals itself). Every test must verify meaningful behavior.
+<routing>
+  <route signal="new project|start from scratch|create a project">Use the new-project path.</route>
+  <route signal="existing files|repository|codebase|bug fix|feature|audit">Use the existing-project path.</route>
+  <route signal="new module in an existing repository">Use new-project guidance for the module and existing-project constraints for integration.</route>
+  <route signal="ambiguous project type">Ask: Is this a new project or an existing codebase?</route>
+</routing>
 
-## Error Recovery Strategy
-When an implementation path is blocked mid-way:
-1. **Stop and report** — explain what failed and why, do not silently switch approaches.
-2. **Propose alternatives** — list 1–3 alternative approaches with trade-offs.
-3. **Rollback guidance** — if partial changes were already applied, provide clear instructions (or commands) to revert them.
-4. **Proceed only with consent** — apply the alternative only after the user confirms.
+### New projects
 
-## Technology Stack Recommendation Rules
-Before implementation, provide optional directions (choose one based on the task, or present multiple in parallel):
-- **Simple & Fast**: minimal dependencies, shortest delivery path.
-- **Maintainable**: clear layering, easy to test, suitable for medium- to long-term iteration.
-- **High Performance**: focused on throughput/latency/resource usage, with acceptance of higher implementation complexity.
-- Recommend appropriate technology stack directions based on user requirements and project type, and explain the reasons.
+<new-project>
+  <missing-inputs>Ask only for project type, language, concrete requirements, and whether stack directions are wanted.</missing-inputs>
+  <output-order>Brief plan; optional stack direction; directory structure; dependency manifest; core files; exact start or test command.</output-order>
+  <stack-directions>
+    <option name="Simple &amp; Fast">Minimize dependencies and delivery time.</option>
+    <option name="Maintainable">Favor clear layering and testability.</option>
+    <option name="High Performance">Optimize throughput, latency, or resource use while accepting complexity.</option>
+  </stack-directions>
+  <stack-recommendations>
+    <domain name="Frontend React"><simple-fast>Vite, React, and Tailwind.</simple-fast><maintainable>Next.js, Zustand, and TanStack Query.</maintainable><high-performance>Next.js SSR, streaming, and edge runtime.</high-performance></domain>
+    <domain name="Frontend Vue"><simple-fast>Vite, Vue 3, and Pinia.</simple-fast><maintainable>Nuxt 3, VueUse, and Pinia.</maintainable><high-performance>Nuxt 3, Nitro edge, and virtual lists.</high-performance></domain>
+    <domain name="Backend Node.js"><simple-fast>Express or Hono.</simple-fast><maintainable>NestJS or Fastify with Prisma.</maintainable><high-performance>Fastify, Drizzle, and Redis caching.</high-performance></domain>
+    <domain name="Backend Python"><simple-fast>Flask or minimal FastAPI.</simple-fast><maintainable>FastAPI, SQLAlchemy, and Pydantic.</maintainable><high-performance>FastAPI with async database access and Celery workers.</high-performance></domain>
+    <domain name="Backend Go"><simple-fast>net/http and the standard library.</simple-fast><maintainable>Gin or Echo with GORM.</maintainable><high-performance>Fiber, pgx, and connection pooling.</high-performance></domain>
+    <domain name="Backend Java"><simple-fast>Minimal Spring Boot.</simple-fast><maintainable>Spring Boot, JPA, and Flyway.</maintainable><high-performance>Quarkus, virtual threads, and reactive patterns.</high-performance></domain>
+    <domain name="Backend Rust"><simple-fast>Minimal Axum.</simple-fast><maintainable>Axum, SQLx, and tower layers.</maintainable><high-performance>Actix-web, SQLx, and Tokio tuning.</high-performance></domain>
+    <domain name="CLI"><simple-fast>Single-file script.</simple-fast><maintainable>Commander for Node.js or Click for Python with a config file.</maintainable><high-performance>Compiled Go or Rust binary.</high-performance></domain>
+  </stack-recommendations>
+</new-project>
 
-### Stack Direction Quick-Reference (by domain)
+### Existing repositories
 
-| Domain | Simple & Fast | Maintainable | High Performance |
-|--------|--------------|--------------|------------------|
-| **Frontend (React)** | Vite + React + Tailwind | Next.js + Zustand + TanStack Query | Next.js SSR + streaming + edge runtime |
-| **Frontend (Vue)** | Vite + Vue 3 + Pinia | Nuxt 3 + VueUse + Pinia | Nuxt 3 + Nitro edge + virtual list |
-| **Backend (Node.js)** | Express / Hono | NestJS / Fastify + Prisma | Fastify + Drizzle + Redis caching |
-| **Backend (Python)** | Flask / FastAPI (minimal) | FastAPI + SQLAlchemy + Pydantic | FastAPI + async DB + Celery workers |
-| **Backend (Go)** | net/http + stdlib | Gin / Echo + GORM | Fiber + pgx + connection pooling |
-| **Backend (Java)** | Spring Boot (minimal) | Spring Boot + JPA + Flyway | Quarkus + virtual threads + reactive |
-| **Backend (Rust)** | Axum (minimal) | Axum + SQLx + tower layers | Actix-web + SQLx + tokio tuning |
-| **CLI Tool** | Single-file script | Commander (Node) / Click (Python) + config file | Compiled binary (Go / Rust) |
+<existing-project>
+  <rule>Read the relevant code and constraints first.</rule>
+  <rule>Make the smallest compatible change; do not perform large-scale refactoring without an explicit request.</rule>
+  <rule>Keep the repository's style, naming, formatting, and organization.</rule>
+  <rule>State affected files, downstream impact, and validation before editing when relevant.</rule>
+</existing-project>
 
-> This table is a starting point. Always adapt to the user's actual constraints and preferences.
+## Domain references
 
-## Security and Vulnerability Handling Rules
-- Do not directly modify code when vulnerabilities are found.
-- First explain the risk, impact scope, and recommended solution.
-- Apply fixes only after obtaining user consent.
+Load references only after activation, and only when the task matches. Read a router first, then only the minimum selected sub-file. If a referenced external skill is unavailable, use the matched file's fallback and note that fact in the result.
 
-### Common Vulnerability Checklist
-When reviewing or generating code, proactively check for:
-- **Injection** (SQL/NoSQL/OS command): use parameterized queries and avoid string interpolation for user input.
-- **XSS**: sanitize/escape all user-provided content rendered in HTML; use framework-native escaping (React JSX auto-escapes, Vue `v-text` auto-escapes; watch out for `dangerouslySetInnerHTML` / `v-html`).
-- **Secrets management**: never hardcode API keys, tokens, or passwords. Use environment variables or a secret manager. Verify `.env` files are in `.gitignore`.
-- **Auth & access control**: validate permissions server-side for every protected operation; never rely on client-side checks alone.
-- **Dependency risks**: flag known-vulnerable packages when spotted; recommend `npm audit` / `pip audit` / `govulncheck` as part of CI.
+<reference-routing>
+  <frontend when="web UI, CSS, browser APIs, React, Vue, Next.js, or Nuxt">Read references/frontend.md, then the selected file from references/frontend/.</frontend>
+  <backend when="server code, APIs, databases, authentication, or deployment">Read references/backend.md, then the selected file from references/backend/.</backend>
+  <cross-cutting when="API design, database design, authentication, or authorization">For backend work, also read references/backend/fundamentals.md.</cross-cutting>
+</reference-routing>
 
-## Task Routing
+## Response style
 
-Apply task routing only after the skill is activated for the current turn.
-
-Route each incoming task to the appropriate handling guideline based on the following signals:
-
-| Signal | Route to |
-|--------|----------|
-| User mentions "new project", "start from scratch", "create a project" | New Project Handling Guidelines |
-| User references existing files, repo, or codebase | Existing Project Modification Guidelines |
-| User asks to fix a bug / add a feature to current code | Existing Project Modification Guidelines |
-| User asks for a code review or audit | Existing Project Modification Guidelines |
-| User asks to add a new module/package within an existing repo | Hybrid: follow New Project Guidelines for the new module, but respect Existing Project constraints for integration |
-| Task type is ambiguous | Ask one clarifying question: "Is this a new project or an existing codebase?" |
-
-## New Project Handling Guidelines
-If required information is missing, ask only the following questions:
-1. What kind of project do you want to build?
-2. Which programming language would you like to use?
-3. What are your specific requirements?
-4. Would you like me to provide optional technology stack directions first (Simple & Fast / Maintainable / High Performance)?
-
-After sufficient input is available, present a brief implementation plan before generating the project output.
-
-Then provide stack options first, followed by implementation content in this order:
-1. **Directory structure** — recommended file/folder layout.
-2. **Dependency list** — package manager file (e.g., `package.json`, `requirements.txt`).
-3. **Core file skeletons** — entry point and key module stubs with inline comments.
-4. **Start command** — exact runnable command to launch or test the project.
-
-## Existing Project Modification Guidelines
-1. Read and understand the current code structure and constraints first.
-2. Implement within the existing architecture; no large-scale refactoring.
-3. Without explicit requirements, do not change the existing code style (keep naming, formatting, and organization consistent).
-4. Output changes should be concise, readable, and compatible with the existing structure.
-5. Before applying changes, briefly assess the impact scope (which files/modules are affected, any downstream consumers), and mention it in the output so the user is aware.
-
-## Domain-Specific Extensions
-
-> **Lazy-loading rule**: Do NOT read any reference file unless the skill is activated for the current turn and the task matches. Start with the entry-point router, then load only the minimal sub-file(s) it selects.
-
-### Frontend Tasks
-- **Entry point**: `references/frontend.md` (routing table only, ~25 lines)
-- **Sub-files**: `references/frontend/react.md`, `references/frontend/vue.md`, `references/frontend/design.md`, `references/frontend/fundamentals.md`
-- **When to load**: task involves web UI, CSS, components, frameworks (React/Vue/Next.js/Nuxt), or browser APIs.
-
-### Backend Tasks
-- **Entry point**: `references/backend.md` (routing table only, ~40 lines)
-- **Sub-files**: `references/backend/nodejs.md`, `references/backend/python.md`, `references/backend/go.md`, `references/backend/java.md`, `references/backend/rust.md`, `references/backend/fundamentals.md`
-- **When to load**: task involves server-side code, APIs, databases, authentication, or deployment.
-
-### External Skill Dependencies
-> Sub-files reference external skill URLs from third-party repos. These may change without notice.
-> If an external skill URL is unreachable, each sub-file contains a **Fallback** section with built-in best practices — use that instead and note it in output.
->
-> Last verified: 2025-04 (vercel-labs/agent-skills, anthropics/claude-code).
+<response-style>
+  <rule>Lead with the completed result or the current blocking fact.</rule>
+  <rule>Do not restate the user's request or re-explain content as plain language, in other words, or 翻成人话.</rule>
+  <rule>Be concise, direct, and proportional to task complexity.</rule>
+  <rule>Keep conceptual explanations to three to five sentences.</rule>
+  <rule>Avoid stock acknowledgements, filler phrases, and generic summary labels; state the final claim directly.</rule>
+  <rule>Use lists only for genuinely parallel information.</rule>
+  <rule>Write necessary code comments in the user's language.</rule>
+  <rule>End with a concrete, actionable result; do not add conditional follow-up offers.</rule>
+</response-style>

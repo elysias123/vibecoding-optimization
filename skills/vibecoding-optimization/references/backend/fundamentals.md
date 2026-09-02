@@ -1,31 +1,42 @@
 # Backend Fundamentals
 
-> Loaded on demand for cross-cutting backend concerns (API design, database patterns, auth).
-> Stack-agnostic — apply alongside any stack-specific sub-file.
+Load this reference for cross-cutting backend work: API design, database patterns, authentication, or authorization. Apply it with the stack-specific reference.
 
-## API Design
-- RESTful conventions: nouns for resources, HTTP verbs for actions, plural endpoints (`/users`, not `/user`).
-- Consistent error response shape: `{ "error": { "code": "...", "message": "..." } }` with appropriate HTTP status codes.
-- Pagination: cursor-based preferred for large datasets; offset-based acceptable for small, stable datasets.
-- Versioning: URL path (`/v1/`) for public APIs; header-based for internal services.
-- Input validation at the boundary; never trust client data.
-- Rate limiting and request-size limits on all public endpoints.
+## API design
 
-## Database Patterns
-- Use an ORM or query builder for business logic; reserve raw SQL for performance-critical paths.
-- Always use migrations for schema changes; never modify production schemas manually.
-- Index foreign keys and frequently queried columns. Avoid over-indexing write-heavy tables.
-- Use transactions for multi-step writes that must be atomic.
-- Connection pooling is mandatory for production deployments.
+<api-rules>
+  <rule>Use plural resource nouns and HTTP verbs: /users, not /user.</rule>
+  <rule>Return a consistent error shape: { "error": { "code": "...", "message": "..." } } with an appropriate HTTP status.</rule>
+  <rule>Prefer cursor pagination for large datasets; allow offset pagination for small, stable datasets.</rule>
+  <rule>Use /v1/ path versioning for public APIs and header versioning for internal services.</rule>
+  <rule>Validate all input at the boundary; never trust client data.</rule>
+  <rule>Apply rate and request-size limits to public endpoints.</rule>
+</api-rules>
 
-## Authentication & Authorization
-- Hash passwords with bcrypt, argon2, or scrypt. Never store plaintext or MD5/SHA hashes.
-- JWT for stateless APIs; session + cookie (with CSRF protection) for server-rendered apps.
-- Validate permissions server-side for every protected operation.
-- Token expiry: short-lived access tokens (15–60 min) + refresh tokens.
-- Store secrets in environment variables or a secret manager; never in source code.
+## Database patterns
+
+<database-rules>
+  <rule>Use an ORM or query builder for business logic; reserve raw SQL for performance-critical paths.</rule>
+  <rule>Use migrations for every schema change; never alter production schemas manually.</rule>
+  <rule>Index foreign keys and frequently queried columns without over-indexing write-heavy tables.</rule>
+  <rule>Use transactions for multi-step writes that must be atomic.</rule>
+  <rule>Use connection pooling in production.</rule>
+</database-rules>
+
+## Authentication and authorization
+
+<auth-rules>
+  <rule>Hash passwords with bcrypt, argon2, or scrypt; never store plaintext, MD5, or SHA hashes.</rule>
+  <rule>Use JWT for stateless APIs and session cookies with CSRF protection for server-rendered applications.</rule>
+  <rule>Validate permissions on the server for every protected operation.</rule>
+  <rule>Use short-lived access tokens (15 to 30 minutes) and refresh tokens.</rule>
+  <rule>Store secrets in environment variables or a secret manager, never source code.</rule>
+</auth-rules>
 
 ## Observability
-- Structured JSON logs with request ID for tracing.
-- Health-check endpoint (`/health` or `/healthz`) for load balancers.
-- Track key metrics: request latency, error rate, DB query duration.
+
+<observability-rules>
+  <rule>Emit structured JSON logs with a request ID.</rule>
+  <rule>Provide a /health or /healthz endpoint for load balancers.</rule>
+  <rule>Track request latency, error rate, and database query duration.</rule>
+</observability-rules>
